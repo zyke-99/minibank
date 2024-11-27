@@ -12,13 +12,15 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomerSpecification {
+@Component
+public class CustomerSpecificationFactory {
 
-    public static Specification<Customer> getSearchTermSpecification(String searchTerm) {
+    public Specification<Customer> getSearchTermSpecification(String searchTerm) {
 
         return (root, query, criteriaBuilder) -> {
 
@@ -27,7 +29,7 @@ public class CustomerSpecification {
         };
     }
 
-    public static List<Predicate> getSearchPredicates(Root<Customer> root, CriteriaBuilder criteriaBuilder,
+    private List<Predicate> getSearchPredicates(Root<Customer> root, CriteriaBuilder criteriaBuilder,
                                                       String name, String lastName,
                                                       String phoneNumber, String email,
                                                       String city) {
@@ -71,7 +73,7 @@ public class CustomerSpecification {
         return predicates;
     }
 
-    private static Predicate getWildcardCaseInsensitiveLikePredicate(CriteriaBuilder criteriaBuilder, Path path, String value) {
+    private Predicate getWildcardCaseInsensitiveLikePredicate(CriteriaBuilder criteriaBuilder, Path path, String value) {
 
         return criteriaBuilder.like(
                 criteriaBuilder.lower(path),

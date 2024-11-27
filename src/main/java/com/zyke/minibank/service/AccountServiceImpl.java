@@ -4,7 +4,7 @@ import com.zyke.minibank.dto.AccountDto;
 import com.zyke.minibank.dto.CreateAccountDto;
 import com.zyke.minibank.entity.Account;
 import com.zyke.minibank.entity.Customer;
-import com.zyke.minibank.exception.MinibankException;
+import com.zyke.minibank.exception.CustomerNotFoundException;
 import com.zyke.minibank.mapper.AccountMapper;
 import com.zyke.minibank.repository.AccountRepository;
 import com.zyke.minibank.repository.CustomerRepository;
@@ -27,7 +27,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccountDto createAccount(CreateAccountDto createAccountDto) {
+    public AccountDto create(CreateAccountDto createAccountDto) {
 
         List<Customer> accountCustomers = createAccountDto.customerIds().stream()
                 .map(customerId -> {
@@ -36,7 +36,7 @@ public class AccountServiceImpl implements AccountService {
 
                         return customerOptional.get();
                     }
-                    throw new MinibankException(HttpStatus.BAD_REQUEST, String.format("No customer with provided id '%s' found when creating an account", customerId));
+                    throw new CustomerNotFoundException(HttpStatus.BAD_REQUEST, String.format("No customer with provided id '%s' found when creating an account", customerId));
                 })
                 .toList();
 

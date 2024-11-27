@@ -1,11 +1,13 @@
 package com.zyke.minibank.exception;
 
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import lombok.Value;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @EqualsAndHashCode(callSuper = true)
-@Value
+@Getter
+@AllArgsConstructor
 public class MinibankException extends RuntimeException {
 
     HttpStatus httpStatus;

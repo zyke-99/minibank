@@ -5,11 +5,12 @@ import com.zyke.minibank.entity.CustomerType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
 import java.util.List;
 
+@Builder
 public record CreateCustomerDto(
-        @JsonProperty("id") Long id,
         @JsonProperty("name") @NotEmpty(message = "Customer name cannot be empty") String name,
         @JsonProperty("lastName") @NotEmpty(message = "Customer last name cannot be empty") String lastName,
         @JsonProperty("phoneNumber") @NotEmpty(message = "Customer phone number cannot be empty") String phoneNumber,

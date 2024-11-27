@@ -8,7 +8,9 @@ import com.zyke.minibank.dto.CustomerDto;
 import com.zyke.minibank.entity.Account;
 import com.zyke.minibank.entity.Address;
 import com.zyke.minibank.entity.Customer;
-import com.zyke.minibank.exception.MinibankException;
+import com.zyke.minibank.exception.AddressOwnershipException;
+import com.zyke.minibank.exception.CustomerNotFoundException;
+import com.zyke.minibank.exception.CustomerNotUniqueException;
 import com.zyke.minibank.mapper.CustomerMapper;
 import com.zyke.minibank.repository.CustomerRepository;
 import jakarta.transaction.Transactional;
@@ -28,6 +30,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerMapper customerMapper;
     private final CustomerRepository customerRepository;
+    private final CustomerSpecificationFactory customerSpecificationFactory;
 
     private final AccountService accountService;
 
@@ -36,7 +39,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         Page<Customer> customers = StringUtils.isEmpty(searchTerm) ? customerRepository.findAll(page) :
                 customerRepository.findAll(
-                        CustomerSpecification.getSearchTermSpecification(searchTerm),
+                        customerSpecificationFactory.getSearchTermSpecification(searchTerm),
                         page
                 );
 
@@ -65,7 +68,7 @@ public class CustomerServiceImpl implements CustomerService {
         );
 
         newCustomer = customerRepository.save(newCustomer);
-        AccountDto customerAccount = accountService.createAccount(
+        AccountDto customerAccount = accountService.create(
                 CreateAccountDto.builder()
                         .customerIds(List.of(newCustomer.getId()))
                         .build()
@@ -85,7 +88,7 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerDto update(CreateCustomerDto customer, Long customerId) {
 
         Customer existingCustomer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new MinibankException(HttpStatus.NOT_FOUND, String.format("Customer with ID '%s' not found", customerId)));
+                .orElseThrow(() -> new CustomerNotFoundException(HttpStatus.NOT_FOUND, String.format("Customer with ID '%s' not found", customerId)));
 
         validateUpdate(customer, customerId);
 
@@ -121,7 +124,7 @@ public class CustomerServiceImpl implements CustomerService {
                             existingAddress.setCity(updatedAddress.city());
                             existingAddress.setCountry(updatedAddress.country());
                         }, () -> {
-                            throw new MinibankException(HttpStatus.BAD_REQUEST, "Provided address ID does not belong to the user");
+                            throw new AddressOwnershipException(HttpStatus.BAD_REQUEST, "Provided address ID does not belong to the user");
                         });
             } else {
 
@@ -139,7 +142,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         if (getCustomerByPersonalData(customer).isPresent()) {
 
-            throw new MinibankException(HttpStatus.BAD_REQUEST, "Customer already exists with such data");
+            throw new CustomerNotUniqueException(HttpStatus.BAD_REQUEST, "Customer already exists with such data");
         }
     }
 
@@ -148,7 +151,7 @@ public class CustomerServiceImpl implements CustomerService {
         Optional<Customer> foundCustomer = getCustomerByPersonalData(customer);
         if (foundCustomer.isPresent() && !foundCustomer.get().getId().equals(customerId)) {
 
-            throw new MinibankException(HttpStatus.BAD_REQUEST, "Customer already exists with such data");
+            throw new CustomerNotUniqueException(HttpStatus.BAD_REQUEST, "Customer already exists with such data");
         }
     }
 
