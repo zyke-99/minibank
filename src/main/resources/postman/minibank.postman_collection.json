@@ -1,0 +1,89 @@
+{
+	"info": {
+		"_postman_id": "cb666210-2371-4b20-8ea7-f790567470ff",
+		"name": "minibank",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36656998"
+	},
+	"item": [
+		{
+			"name": "Create customer",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Testman\",\n    \"lastName\": \"Testberg\",\n    \"phoneNumber\": \"867776743\",\n    \"email\": \"very.anonymous@anon.uz\",\n    \"type\": \"PRIVATE\",\n    \"addresses\": [\n        {\n            \"country\": \"Lithuania\",\n            \"city\": \"Palanga\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/customers",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"customers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update customer",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Testman\",\n    \"lastName\": \"Testberg\",\n    \"phoneNumber\": \"867776743\",\n    \"email\": \"new.very.anonymous@anon.uz\",\n    \"type\": \"INDIVIDUAL\",\n    \"addresses\": [\n        {\n            \"country\": \"Lithuania\",\n            \"city\": \"Vilnius\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/customers/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"customers",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get customers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/customers?searchTerm=Viln",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"customers"
+					],
+					"query": [
+						{
+							"key": "searchTerm",
+							"value": "Viln"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
