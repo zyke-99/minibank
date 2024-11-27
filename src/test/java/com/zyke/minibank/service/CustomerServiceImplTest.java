@@ -232,6 +232,28 @@ class CustomerServiceImplTest {
     }
 
     @Test
+    void testUpdateThrowsExceptionIfCustomerDataNotUnique() {
+
+        // setup
+        Long customerId = 1L;
+        CreateCustomerDto updateDto = CreateCustomerDto.builder()
+                .name("Testman")
+                .lastName("Testberg")
+                .phoneNumber("123456789")
+                .email("testman@example.com")
+                .addresses(List.of())
+                .build();
+
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(Customer.builder().id(1L).build()));
+
+        when(customerRepository.findByNameAndLastNameAndPhoneNumberAndEmail(updateDto.name(), updateDto.lastName(),
+                updateDto.phoneNumber(), updateDto.email())).thenReturn(Optional.of(Customer.builder().id(2L).build()));
+
+        // execute and verify
+        assertThrows(CustomerNotUniqueException.class, () -> customerService.update(updateDto, customerId));
+    }
+
+    @Test
     void testUpdateThrowsExceptionIfProvidedAddressDoesNotBelongToUser() {
 
         // setup
