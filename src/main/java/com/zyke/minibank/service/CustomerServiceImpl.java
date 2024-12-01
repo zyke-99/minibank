@@ -1,11 +1,8 @@
 package com.zyke.minibank.service;
 
-import com.zyke.minibank.dto.AccountDto;
 import com.zyke.minibank.dto.AddressDto;
-import com.zyke.minibank.dto.CreateAccountDto;
 import com.zyke.minibank.dto.CreateCustomerDto;
 import com.zyke.minibank.dto.CustomerDto;
-import com.zyke.minibank.entity.Account;
 import com.zyke.minibank.entity.Address;
 import com.zyke.minibank.entity.Customer;
 import com.zyke.minibank.exception.AddressOwnershipException;
@@ -34,7 +31,6 @@ public class CustomerServiceImpl implements CustomerService {
 
     private final AccountService accountService;
 
-    @Override
     public Page<CustomerDto> search(Pageable page, String searchTerm) {
 
         Page<Customer> customers = StringUtils.isEmpty(searchTerm) ? customerRepository.findAll(page) :
@@ -48,42 +44,12 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional
-    public CustomerDto create(CreateCustomerDto customer) {
+    public Customer create(Customer customer) {
 
-        validateCreate(customer);
-
-        Customer newCustomer = Customer.builder()
-                .name(customer.name())
-                .lastName(customer.lastName())
-                .phoneNumber(customer.phoneNumber())
-                .email(customer.email())
-                .type(customer.type())
-                .build();
-
-        newCustomer.getAddresses().addAll(
-                customer.addresses().stream()
-                        .map(addressDto -> Address.builder()
-                                .country(addressDto.country())
-                                .city(addressDto.city()).build()).toList()
-        );
-
-        newCustomer = customerRepository.save(newCustomer);
-        AccountDto customerAccount = accountService.create(
-                CreateAccountDto.builder()
-                        .customerIds(List.of(newCustomer.getId()))
-                        .build()
-        );
-
-        newCustomer.getAccounts().add(
-                Account.builder()
-                        .id(customerAccount.id())
-                        .balance(customerAccount.balance())
-                        .build()
-        );
-        return customerMapper.toDto(newCustomer);
+//        validateCreate(customer);
+        return customerRepository.save(customer);
     }
 
-    @Override
     @Transactional
     public CustomerDto update(CreateCustomerDto customer, Long customerId) {
 

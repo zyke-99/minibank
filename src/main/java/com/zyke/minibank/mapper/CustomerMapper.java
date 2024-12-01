@@ -1,10 +1,13 @@
 package com.zyke.minibank.mapper;
 
+import com.zyke.minibank.dto.CreateCustomerDto;
 import com.zyke.minibank.dto.CustomerAccountDto;
 import com.zyke.minibank.dto.CustomerDto;
 import com.zyke.minibank.entity.Customer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
 
 @Component
 @RequiredArgsConstructor
@@ -39,5 +42,19 @@ public class CustomerMapper {
                 .lastModifiedBy(customer.getLastModifiedBy())
                 .lastModifiedDate(customer.getLastModifiedDate())
                 .build();
+    }
+
+    public Customer fromCreateCustomerDto(CreateCustomerDto createCustomerDto) {
+
+        Customer customer = Customer.builder()
+                .name(createCustomerDto.name())
+                .lastName(createCustomerDto.lastName())
+                .phoneNumber(createCustomerDto.phoneNumber())
+                .email(createCustomerDto.email())
+                .type(createCustomerDto.type())
+                .build();
+
+        customer.setAddresses(new ArrayList<>());
+        return customer;
     }
 }

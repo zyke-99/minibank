@@ -1,0 +1,13 @@
+If we exclusively use DTOs as input output of our services, there might be some issues:
+1. Testing - it may become harder, as we’d also have to account for conversion to DTOs in the service layer
+2. If we for some reason need service-to-service interactions, it would require Entity-DTO-Entity conversions, which also might include extra queries in some cases (checking whether or not a parent entity exists when creating a child entity)
+   
+My first approach was strictly using DTOs, which led to problems mentioned above and I did get some flak for it. Original reasoning - each service should be somewhat independent, e.g. you could call the 'create an account' method not only when creating a customer, but also just when creating an account itself, but there are better ways of doing this. 
+
+If we use Entities as return types - that’s also not that great IMO. Although it would allow avoiding additional queries. The idea that an Entity is present in all of the application layers (presentation, service, data) feels so wrong. Ideally one structure should only be used between two layers, which tends to happens when following DDD (domain driven design) practices, but not going down that path just yet. Also, what if we had an endpoint for creating an account by itself, without creating a customer and using an existing one? I wouldn’t quite encumber the controller to handle first fetching a customer then providing it to the account service.
+
+So, considering the options we have, adding a layer on top of services would make sense. We would use an orchestrator - calling multiple services if required. The issue I’m seeing with this - it will add bloat. For example, we will probably have a ‘find customer by id’ use case and in such a case, the ‘orchestrator’ would act only as a proxy to the service without actually having any other steps (other than maybe calling DTO-entity and entity-DTO conversion components). Again, this could be considered a bad practice somewhat, code is a liability and all that, however, IMHO this will have more upsides:
+1. No need to re-query entities on operations related to multiple entities.
+2. Services only depend on the layer below and don’t depend on each other.
+   
+Regarding the added ‘bloat’, my strong opinion is that consistency is more important in this case, even though this demo project is quite small. It’s more convenient to work and develop the application knowing what to expect from what component/layer, less mishmash/maintenance overhead.
