@@ -9,8 +9,6 @@ import com.zyke.minibank.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 @RequiredArgsConstructor
 public class CustomerOrchestrator {
@@ -27,6 +25,12 @@ public class CustomerOrchestrator {
         customer = customerService.create(customer);
         accountService.createForCustomer(customer);
 
-        return customerMapper.toDto(customer);
+        return customerMapper.toCustomerDto(customer);
+    }
+
+    public CustomerDto updateCustomer(Long id, CreateCustomerDto createCustomerDto) {
+
+        Customer customer = customerMapper.fromCreateCustomerDto(createCustomerDto);
+        return customerMapper.toCustomerDto(customerService.update(id, customer));
     }
 }

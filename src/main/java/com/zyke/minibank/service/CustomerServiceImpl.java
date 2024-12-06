@@ -1,7 +1,5 @@
 package com.zyke.minibank.service;
 
-import com.zyke.minibank.dto.AddressDto;
-import com.zyke.minibank.dto.CreateCustomerDto;
 import com.zyke.minibank.dto.CustomerDto;
 import com.zyke.minibank.entity.Address;
 import com.zyke.minibank.entity.Customer;
@@ -10,7 +8,6 @@ import com.zyke.minibank.exception.CustomerNotFoundException;
 import com.zyke.minibank.exception.CustomerNotUniqueException;
 import com.zyke.minibank.mapper.CustomerMapper;
 import com.zyke.minibank.repository.CustomerRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -29,8 +26,6 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerSpecificationFactory customerSpecificationFactory;
 
-    private final AccountService accountService;
-
     public Page<CustomerDto> search(Pageable page, String searchTerm) {
 
         Page<Customer> customers = StringUtils.isEmpty(searchTerm) ? customerRepository.findAll(page) :
@@ -39,93 +34,62 @@ public class CustomerServiceImpl implements CustomerService {
                         page
                 );
 
-        return customers.map(customerMapper::toDto);
+        return customers.map(customerMapper::toCustomerDto);
     }
 
     @Override
-    @Transactional
     public Customer create(Customer customer) {
-
-//        validateCreate(customer);
-        return customerRepository.save(customer);
-    }
-
-    @Transactional
-    public CustomerDto update(CreateCustomerDto customer, Long customerId) {
-
-        Customer existingCustomer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new CustomerNotFoundException(HttpStatus.NOT_FOUND, String.format("Customer with ID '%s' not found", customerId)));
-
-        validateUpdate(customer, customerId);
-
-        existingCustomer.setName(customer.name());
-        existingCustomer.setLastName(customer.lastName());
-        existingCustomer.setPhoneNumber(customer.phoneNumber());
-        existingCustomer.setEmail(customer.email());
-        existingCustomer.setType(customer.type());
-
-        updateCustomerAddresses(existingCustomer, customer.addresses());
-
-        return customerMapper.toDto(customerRepository.save(existingCustomer));
-    }
-
-    private void updateCustomerAddresses(Customer existingCustomer, List<AddressDto> addresses) {
-
-        existingCustomer.getAddresses().removeIf(existingAddress -> {
-            Long existingAddressId = existingAddress.getId();
-
-            return addresses.isEmpty() || addresses.stream()
-                    .noneMatch(updatedAddress -> updatedAddress.id() != null && updatedAddress.id().equals(existingAddressId));
-        });
-
-        addresses.forEach(updatedAddress -> {
-            Long addressId = updatedAddress.id();
-
-            if (addressId != null) {
-
-                existingCustomer.getAddresses().stream()
-                        .filter(existingAddress -> existingAddress.getId().equals(addressId))
-                        .findFirst()
-                        .ifPresentOrElse(existingAddress -> {
-                            existingAddress.setCity(updatedAddress.city());
-                            existingAddress.setCountry(updatedAddress.country());
-                        }, () -> {
-                            throw new AddressOwnershipException(HttpStatus.BAD_REQUEST, "Provided address ID does not belong to the user");
-                        });
-            } else {
-
-                existingCustomer.getAddresses().add(
-                        Address.builder()
-                                .country(updatedAddress.country())
-                                .city(updatedAddress.city())
-                                .build()
-                );
-            }
-        });
-    }
-
-    private void validateCreate(CreateCustomerDto customer) {
 
         if (getCustomerByPersonalData(customer).isPresent()) {
 
             throw new CustomerNotUniqueException(HttpStatus.BAD_REQUEST, "Customer already exists with such data");
         }
+
+        return customerRepository.save(customer);
     }
 
-    private void validateUpdate(CreateCustomerDto customer, Long customerId) {
+    public Customer update(Long id, Customer customer) {
+
+        Customer existingCustomer = customerRepository.findById(id)
+                .orElseThrow(() -> new CustomerNotFoundException(HttpStatus.NOT_FOUND, String.format("Customer with ID '%s' not found", id)));
 
         Optional<Customer> foundCustomer = getCustomerByPersonalData(customer);
-        if (foundCustomer.isPresent() && !foundCustomer.get().getId().equals(customerId)) {
+        if (foundCustomer.isPresent() && !foundCustomer.get().getId().equals(id)) {
 
             throw new CustomerNotUniqueException(HttpStatus.BAD_REQUEST, "Customer already exists with such data");
         }
+
+        existingCustomer.setName(customer.getName());
+        existingCustomer.setLastName(customer.getLastName());
+        existingCustomer.setPhoneNumber(customer.getPhoneNumber());
+        existingCustomer.setEmail(customer.getEmail());
+        existingCustomer.setType(customer.getType());
+
+        updateAddresses(existingCustomer, customer.getAddresses());
+
+        return existingCustomer;
     }
 
-    private Optional<Customer> getCustomerByPersonalData(CreateCustomerDto customer) {
+    private void updateAddresses(Customer existingCustomer, List<Address> updatedAddresses) {
+        List<Address> existingAddresses = existingCustomer.getAddresses();
 
-        return customerRepository.findByNameAndLastNameAndPhoneNumberAndEmail(customer.name(),
-                customer.lastName(),
-                customer.phoneNumber(),
-                customer.email());
+        updatedAddresses.forEach(updatedAddress -> {
+            Address existingAddress = existingAddresses.stream()
+                    .filter(address -> address.getId().equals(updatedAddress.getId()))
+                    .findFirst()
+                    .orElseThrow(() -> new AddressOwnershipException(HttpStatus.BAD_REQUEST,
+                            String.format("Address with ID '%s' does not belong to the customer", updatedAddress.getId())));
+
+            existingAddress.setCity(updatedAddress.getCity());
+            existingAddress.setCountry(updatedAddress.getCountry());
+        });
+    }
+
+    private Optional<Customer> getCustomerByPersonalData(Customer customer) {
+
+        return customerRepository.findByPersonalData(customer.getName(),
+                customer.getLastName(),
+                customer.getPhoneNumber(),
+                customer.getEmail());
     }
 }

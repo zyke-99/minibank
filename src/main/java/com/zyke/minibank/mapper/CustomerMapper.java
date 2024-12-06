@@ -3,11 +3,12 @@ package com.zyke.minibank.mapper;
 import com.zyke.minibank.dto.CreateCustomerDto;
 import com.zyke.minibank.dto.CustomerAccountDto;
 import com.zyke.minibank.dto.CustomerDto;
+import com.zyke.minibank.entity.Address;
 import com.zyke.minibank.entity.Customer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -15,7 +16,7 @@ public class CustomerMapper {
 
     private final AddressMapper addressMapper;
 
-    public CustomerDto toDto(Customer customer) {
+    public CustomerDto toCustomerDto(Customer customer) {
 
         if (customer == null) {
 
@@ -30,7 +31,7 @@ public class CustomerMapper {
                 .email(customer.getEmail())
                 .type(customer.getType())
                 .addresses(customer.getAddresses().stream()
-                        .map(addressMapper::toDto).toList())
+                        .map(addressMapper::toAddressDto).toList())
                 .accounts(customer.getAccounts().stream()
                         .map(account -> CustomerAccountDto.builder()
                                 .id(account.getId())
@@ -46,6 +47,11 @@ public class CustomerMapper {
 
     public Customer fromCreateCustomerDto(CreateCustomerDto createCustomerDto) {
 
+        if (createCustomerDto == null) {
+
+            return null;
+        }
+
         Customer customer = Customer.builder()
                 .name(createCustomerDto.name())
                 .lastName(createCustomerDto.lastName())
@@ -54,7 +60,15 @@ public class CustomerMapper {
                 .type(createCustomerDto.type())
                 .build();
 
-        customer.setAddresses(new ArrayList<>());
+        if (createCustomerDto.addresses() != null) {
+
+            List<Address> addresses = createCustomerDto.addresses().stream()
+                    .map(addressMapper::fromAddressDto)
+                    .toList();
+
+            customer.setAddresses(addresses);
+        }
+
         return customer;
     }
 }
