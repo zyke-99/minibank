@@ -11,7 +11,7 @@ public class AccountMapper {
 
     private final CustomerMapper customerMapper;
 
-    public AccountDto toDto(Account account) {
+    public AccountDto toAccountDto(Account account) {
 
         if (account == null) {
 
@@ -22,7 +22,7 @@ public class AccountMapper {
                 .id(account.getId())
                 .balance(account.getBalance())
                 .customers(account.getCustomers().stream()
-                        .map(customerMapper::toDto).toList())
+                        .map(customerMapper::toCustomerDto).toList())
                 .build();
     }
 }

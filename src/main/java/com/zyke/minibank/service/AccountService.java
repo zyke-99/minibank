@@ -1,9 +1,9 @@
 package com.zyke.minibank.service;
 
-import com.zyke.minibank.dto.AccountDto;
-import com.zyke.minibank.dto.CreateAccountDto;
+import com.zyke.minibank.entity.Account;
+import com.zyke.minibank.entity.Customer;
 
 public interface AccountService {
 
-    AccountDto create(CreateAccountDto createAccountDto);
+    Account createForCustomer(Customer customer);
 }
