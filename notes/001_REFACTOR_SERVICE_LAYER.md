@@ -41,4 +41,8 @@ removing the logic of the 1st and 3rd points, keeping the 4th just for good meas
 
 This one is pretty basic - the tests were pretty bad, I rushed them a bit
 and practically tested mocking rather than the service under test. Anyhow, by introducing
-the orchestration classes, tests should be a bit more concise and cleaner now without over-mocking. 
+the orchestration classes, tests should be a bit more concise and cleaner now without over-mocking.
+
+## **Refactoring the search implementation**
+
+This one I've yet to handle in this bundle of changes, I'll need to think about this a bit later on, there are other quick wins at hand.
