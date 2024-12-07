@@ -12,11 +12,13 @@ import java.util.Optional;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long>, JpaSpecificationExecutor<Customer> {
 
-    @Query("SELECT * FROM Customer c" +
-            "WHERE c.name = :name " +
-            "AND c.lastName = :lastName" +
-            "AND c.phoneNumber = :phoneNumber" +
-            "AND c.email = :email")
+    @Query("""
+                SELECT c FROM Customer c
+                WHERE c.name = :name
+                AND c.lastName = :lastName
+                AND c.phoneNumber = :phoneNumber
+                AND c.email = :email
+            """)
     Optional<Customer> findByPersonalData(@Param("name") String name,
                                           @Param("lastName") String lastName,
                                           @Param("phoneNumber") String phoneNumber,
