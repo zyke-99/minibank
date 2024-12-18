@@ -17,16 +17,33 @@ public class AddressMapper {
         return AddressDto.builder()
                 .id(address.getId())
                 .country(address.getCountry())
-                .city(address.getCity())
+                .postcode(address.getPostcode())
+                .region(address.getRegion())
+                .town(address.getTown())
+                .streetType(address.getStreetType())
+                .streetName(address.getStreetName())
+                .streetNumber(address.getStreetNumber())
+                .floor(address.getFloor())
                 .build();
     }
 
     public Address fromAddressDto(AddressDto addressDto) {
 
+        if (addressDto == null) {
+
+            return null;
+        }
+
         return Address.builder()
                 .id(addressDto.id())
                 .country(addressDto.country())
-                .city(addressDto.city())
+                .postcode(addressDto.postcode())
+                .region(addressDto.region())
+                .town(addressDto.town())
+                .streetType(addressDto.streetType())
+                .streetName(addressDto.streetName())
+                .streetNumber(addressDto.streetNumber())
+                .floor(addressDto.floor())
                 .build();
     }
 }
