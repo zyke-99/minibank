@@ -32,7 +32,7 @@ public class CustomerSpecificationFactory {
     private List<Predicate> getSearchPredicates(Root<Customer> root, CriteriaBuilder criteriaBuilder,
                                                       String name, String lastName,
                                                       String phoneNumber, String email,
-                                                      String city) {
+                                                      String town) {
 
         List<Predicate> predicates = new ArrayList<>();
         if (StringUtils.isNotEmpty(name)) {
@@ -62,11 +62,11 @@ public class CustomerSpecificationFactory {
             );
         }
 
-        if (StringUtils.isNotEmpty(city)) {
+        if (StringUtils.isNotEmpty(town)) {
 
             Join<Customer, Address> customerAddressJoin = root.join(Customer_.ADDRESSES, JoinType.LEFT);
             predicates.add(
-                    getWildcardCaseInsensitiveLikePredicate(criteriaBuilder, customerAddressJoin.get(Address_.CITY), city)
+                    getWildcardCaseInsensitiveLikePredicate(criteriaBuilder, customerAddressJoin.get(Address_.TOWN), town)
             );
         }
 

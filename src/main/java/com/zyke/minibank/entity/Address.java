@@ -21,6 +21,24 @@ public class Address extends BaseEntity {
     @Column(name = "country", nullable = false)
     private String country;
 
-    @Column(name = "city", nullable = false)
-    private String city;
+    @Column(name = "postcode")
+    private String postcode;
+
+    @Column(name = "region")
+    private String region;
+
+    @Column(name = "town", nullable = false)
+    private String town;
+
+    @Column(name = "street_type")
+    private String streetType;
+
+    @Column(name = "street_name", nullable = false)
+    private String streetName;
+
+    @Column(name = "street_number", nullable = false)
+    private String streetNumber;
+
+    @Column(name = "floor")
+    private String floor;
 }

@@ -80,8 +80,14 @@ public class CustomerServiceImpl implements CustomerService {
                     .orElseThrow(() -> new AddressOwnershipException(HttpStatus.BAD_REQUEST,
                             String.format("Address with ID '%s' does not belong to the customer", updatedAddress.getId())));
 
-            existingAddress.setCity(updatedAddress.getCity());
             existingAddress.setCountry(updatedAddress.getCountry());
+            existingAddress.setPostcode(updatedAddress.getPostcode());
+            existingAddress.setRegion(updatedAddress.getRegion());
+            existingAddress.setTown(updatedAddress.getTown());
+            existingAddress.setStreetType(updatedAddress.getStreetType());
+            existingAddress.setStreetName(updatedAddress.getStreetName());
+            existingAddress.setStreetNumber(updatedAddress.getStreetNumber());
+            existingAddress.setFloor(updatedAddress.getFloor());
         });
     }
 

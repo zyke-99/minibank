@@ -73,7 +73,7 @@ class CustomerServiceImplTest {
         updatedCustomer.setPhoneNumber("UpdatedPhoneNumber");
         updatedCustomer.setEmail("UpdatedEmail");
         updatedCustomer.setType(CustomerType.PUBLIC);
-        updatedCustomer.getAddresses().forEach(address -> address.setCity("UpdatedCity"));
+        updatedCustomer.getAddresses().forEach(address -> address.setTown("UpdatedCity"));
 
         when(customerRepository.findById(customerId)).thenReturn(Optional.of(existingCustomer));
 
@@ -128,7 +128,7 @@ class CustomerServiceImplTest {
                         Address.builder()
                                 .id(1L)
                                 .country("Testuania")
-                                .city("Testnius")
+                                .town("Testnius")
                                 .build()
                 ))
                 .build();

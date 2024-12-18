@@ -30,6 +30,9 @@ public class CustomerMapper {
                 .phoneNumber(customer.getPhoneNumber())
                 .email(customer.getEmail())
                 .type(customer.getType())
+                .nationalId(customer.getNationalId())
+                .dateOfBirth(customer.getDateOfBirth())
+                .status(customer.getStatus())
                 .addresses(customer.getAddresses().stream()
                         .map(addressMapper::toAddressDto).toList())
                 .accounts(customer.getAccounts().stream()
@@ -58,6 +61,8 @@ public class CustomerMapper {
                 .phoneNumber(createCustomerDto.phoneNumber())
                 .email(createCustomerDto.email())
                 .type(createCustomerDto.type())
+                .nationalId(createCustomerDto.nationalId())
+                .dateOfBirth(createCustomerDto.dateOfBirth())
                 .build();
 
         if (createCustomerDto.addresses() != null) {
